@@ -1,0 +1,60 @@
+// import font Montserrat
+@import url('https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap');
+
+// Dichiaro variabili font-size && color
+$title: 36px;
+$smtitle:30px;
+$p: 16px;
+
+$black:#000;
+$white:#fff;
+
+h1,h2,h3,h4,p,span{
+    font-family: 'Montserrat', sans-serif;
+}
+
+p{
+    font-size: $p;
+}
+
+h1{
+    font-size: $title;
+}
+
+h2,h3,h4{
+    font-size: $smtitle;
+}
+
+@keyframes animationtext {
+    from {
+        opacity: 0;
+        transform: translateY(12vw);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+
+  @keyframes animationtext2 {
+    from {
+        opacity: 0;
+        transform: translateY(28vw);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+  }
+
+
+  @keyframes opacity {
+    from {
+        opacity: 0;
+
+    }
+    to {
+        opacity: 1;
+        
+    }
+  }

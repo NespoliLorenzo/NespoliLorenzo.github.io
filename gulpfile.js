@@ -13,6 +13,7 @@ const paths = {
             './node_modules/gsap/src/minified/TweenMax.min.js',
             './node_modules/scrollmagic/scrollmagic/uncompressed/ScrollMagic.js',
             './node_modules/scrollmagic/scrollmagic/uncompressed/plugins/animation.gsap.js',
+            // './node_modules/handlebars/dist/handlebars.min.js',
         ],
         src: './app/src/js/app.js',
         dest: './app/assets/js/'
@@ -24,6 +25,16 @@ const paths = {
     },
     DIR: './app'
 };
+
+var options = {
+    batch : ['./app/components'],
+    helpers : {
+        capitals : function(str){
+            return str.toUpperCase();
+        }  
+    }
+}
+
 
 const clean = () => del([paths.DIR + '/assets/js', paths.DIR + '/assets/css']);
 
@@ -71,6 +82,12 @@ function check1() {
 function check2() {
     watch([paths.scripts.src, paths.styles.watch ], series(clean, parallel(scripts, styles), reload));
 }
+
+// function hbs(){
+//     return gulp.src(['/*.html' ])
+//     .pipe(compileHandlebars(options))
+// }
+
 
 // la squenza di operazioni che effetuo con il comando gulp
 const dev = series(clean, parallel(scripts, styles), serve, parallel(check1, check2));

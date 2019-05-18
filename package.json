@@ -18,10 +18,12 @@
     "del": "^4.1.0",
     "gsap": "^2.1.2",
     "gulp": "^4.0.0",
+    "gulp-compile-handlebars": "^0.6.1",
     "gulp-concat": "^2.6.1",
     "gulp-postcss": "^8.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
+    "handlebars": "^4.0.11",
     "jquery": "^3.4.1",
     "scrollmagic": "^2.0.6"
   }
