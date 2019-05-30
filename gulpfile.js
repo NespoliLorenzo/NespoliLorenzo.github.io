@@ -1,94 +1,89 @@
-const { series, watch, src, dest, parallel } = require('gulp');
-const concat       = require('gulp-concat');
-const sass         = require('gulp-sass');
-const del          = require('del');
-const postcss      = require('gulp-postcss');
-const sourcemaps   = require('gulp-sourcemaps');
-const autoprefixer = require('autoprefixer');
-const sync         = require('browser-sync').create();
-const paths = {
-    scripts: {
-        vendors: [
-            './node_modules/jquery/dist/jquery.min.js',
-            './node_modules/gsap/src/minified/TweenMax.min.js',
-            './node_modules/scrollmagic/scrollmagic/uncompressed/ScrollMagic.js',
-            './node_modules/scrollmagic/scrollmagic/uncompressed/plugins/animation.gsap.js',
-            // './node_modules/handlebars/dist/handlebars.min.js',
-        ],
-        src: './app/src/js/app.js',
-        dest: './app/assets/js/'
-    },
-    styles: {
-        src: './app/src/scss/app.scss',
-        watch: './app/src/scss/**/*.scss',
-        dest: './app/assets/css/'
-    },
-    DIR: './app'
-};
-
-var options = {
-    batch : ['./app/components'],
-    helpers : {
-        capitals : function(str){
-            return str.toUpperCase();
-        }  
-    }
-}
-
-
-const clean = () => del([paths.DIR + '/assets/js', paths.DIR + '/assets/css']);
-
-function scripts() {
-    var array = new Array();
-    array = paths.scripts.vendors;
-    array.push(paths.scripts.src);
-    return src(array)
-    .pipe(concat('app.js'))
-    .pipe(dest(paths.scripts.dest));
-}
-
-function styles() {
-    return src(paths.styles.src)
-    .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-    .pipe(concat('app.css'))
-    .pipe(sourcemaps.init())
-    .pipe(postcss([ autoprefixer() ]))
-    .pipe(sourcemaps.write('.'))
-    .pipe(dest(paths.styles.dest));
-}
-
-function reload(done) {
-    sync.reload();
-    // setTimeout(function(){
-    //     sync.reload(["*.css"]);
-    // }, 1000);
-    done();
-}
-
-function serve (done) {
-    sync.init({
-        server: {
-            baseDir: "./"
-        },
-        notify: false
+var data = {},
+    gulp = require('gulp'),
+    plugins = require('gulp-load-plugins')({
+        pattern: '*'
     });
-    done();
-}
-
-function check1() {
-    watch([paths.DIR, paths.DIR + '/assets/img/**/*.png', paths.DIR + '/assets/img/**/*.jpeg', './**/*.html'], reload);
-}
-
-function check2() {
-    watch([paths.scripts.src, paths.styles.watch ], series(clean, parallel(scripts, styles), reload));
-}
-
-// function hbs(){
-//     return gulp.src(['/*.html' ])
-//     .pipe(compileHandlebars(options))
-// }
 
 
-// la squenza di operazioni che effetuo con il comando gulp
-const dev = series(clean, parallel(scripts, styles), serve, parallel(check1, check2));
-exports.default = dev;
+gulp.task('scripts', function(){
+    gulp.src([
+        './app/src/js/app.js'
+        ])
+        .pipe(plugins.concat('app.js'))
+        .pipe(plugins.minify())
+        .pipe(gulp.dest('./app/assets/scripts'));
+});
+gulp.task('styles', function(){
+    gulp.src(['./app/src/scss/*.scss'])
+    .pipe(plugins.sass({
+        outputStyle: 'compressed',
+        includePaths: []
+    }).on('error',plugins.sass.logError))
+    .pipe(gulp.dest('./app/assets/css/'))
+});
+
+gulp.task('tpl', function(){
+    // var data = JSON.parse(plugins.fs.readFileSync('./app/assets/json/db.json'));
+    var n = 1;
+    var options = {
+        batch : ['./app/components'],
+        helpers : {
+            capitals : function(str){
+                return str.toUpperCase();
+            },
+            n: function(str,options){
+                return n++;
+            },
+            ifFirst: function (index, options) {
+                if(index == 0){
+                    return options.fn(this);
+                } else {
+                    return options.inverse(this);
+                }
+            },
+            slugify: function(str){
+                return str.toString().toLowerCase()
+                        .replace(/\s+/g, '-')           // Replace spaces with -
+                        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+                        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                        .replace(/^-+/, '')             // Trim - from start of text
+                        .replace(/-+$/, '');            // Trim - from end of text
+            }
+        }
+    }
+
+    gulp.src([
+        './app/*.html'
+        ])
+        .pipe(plugins.compileHandlebars(data, options))
+        .pipe(plugins.injectString.replace('{%','{{'))
+        .pipe(plugins.injectString.replace('%}','}}'))
+        .pipe(plugins.htmlmin({collapseWhitespace: true, minifyJS: true, minifyCSS: true }))
+        .pipe(gulp.dest('./'));
+
+
+});
+gulp.task('reload', function(){
+    plugins.browserSync.reload('index.html');
+});
+
+gulp.task('default',['tpl','scripts','styles'],
+    function(){
+        console.log('ENVIROMENT: '+ENV);
+        console.log('DIRECTORY: '+DIR); 
+    }
+);
+
+gulp.task('watch',['tpl','styles','scripts'],function(){
+
+    plugins.browserSync.init({
+        port: 3000,
+        notify: true,
+        logPrefix: 'BS',
+        server: ['./']
+    });
+
+    gulp.watch(['./app/assets/scss/**/*.scss'],['styles', 'reload']);
+    gulp.watch(['./app/**/*.html','./app/**/*.hbs','./app/**/*.handlebars'],['tpl','reload']);
+    gulp.watch('./app/assets/scripts/**/*.js',['scripts','reload' ]);
+});
