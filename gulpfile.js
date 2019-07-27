@@ -84,6 +84,8 @@ gulp.task('watch',['tpl','styles','scripts'],function(){
     });
 
     gulp.watch(['./app/assets/scss/**/*.scss'],['styles', 'reload']);
+    gulp.watch(['./app/src/scss/**/*.scss'],['styles', 'reload']);
     gulp.watch(['./app/**/*.html','./app/**/*.hbs','./app/**/*.handlebars'],['tpl','reload']);
     gulp.watch('./app/assets/scripts/**/*.js',['scripts','reload' ]);
+    gulp.watch('./app/src/js/**/*.js',['scripts','reload' ]);
 });

@@ -53,5 +53,16 @@ body {
             animation-name: opacity;
             animation-duration: 13s;
         }
+        a{
+            position: absolute;
+            bottom:20px;
+            left:0;
+            right:0;
+            color:#fff;
+            width: 50%;
+            display: block;
+            margin: 0 auto;
+            text-align: center;
+        }
     }
 }
