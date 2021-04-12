@@ -1,1 +1,0 @@
-var app={init:function(){},track:function(e,t,n,a){"undefined"!=typeof ga&&gtag("event",e,{event_category:t,event_label:n,value:a})}};jQuery(document).ready(function(){app.init()}),jQuery(window).scroll(function(){app.track("Scroll event","page","to","bottom")});
